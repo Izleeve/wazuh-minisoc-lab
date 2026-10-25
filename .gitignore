@@ -1,0 +1,19 @@
+﻿# Secrets and private keys
+*.key
+*.pem
+*.p12
+*.pfx
+.env
+.env.*
+
+# Logs and runtime state
+*.log
+*.pid
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
