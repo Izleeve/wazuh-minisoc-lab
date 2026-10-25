@@ -6,7 +6,7 @@ A hands-on Security Operations Center (SOC) home lab built to practise endpoint 
 
 This project demonstrates a small, isolated SOC monitoring environment. A Kali Linux virtual machine runs the Wazuh agent and Nginx. Wazuh collects and analyses events, generates alerts, and displays them in the dashboard for investigation.
 
-**Project status:** Core lab deployment and two detection-validation exercises completed.
+**Project status:** Core lab deployment and three controlled validation exercises completed; two detections were confirmed, while the Nmap test identified an unconfirmed detection gap.
 
 ## Lab Architecture
 
@@ -64,17 +64,39 @@ The event used a local source address (`127.0.0.1`). This validates basic log co
 
 **Rule-tuning observation:** The generated rule description refers to a “400 error code,” while the recorded test response was HTTP `404`. This discrepancy is documented for further rule-review rather than treated as proof of malicious activity.
 
+
+### 3. Nmap Port Scan Detection Gap
+
+**Objective:** Check whether Wazuh identifies a controlled TCP port scan against the monitored Kali Linux VM.
+
+- Ran Nmap 7.99 with a TCP connect scan (`-sT`), timing template T2, and the top 100 TCP ports against the authorized lab VM at `192.168.182.128`.
+- Observed `22/tcp` (SSH) and `80/tcp` (HTTP) open; the other 98 scanned TCP ports were reported closed.
+- Confirmed the Wazuh agent `kali-vm` (ID `001`) was active.
+- Searched the available Wazuh alert records and dashboard for Nmap-related results; no Nmap-specific alert was confirmed in the records examined.
+
+**Assessment:** The scan completed successfully, but Wazuh detection of the scan was not demonstrated. The cause remains undetermined. This is documented as a monitoring detection gap, not as a successful detection or proof that Wazuh cannot detect port scans.
+
+![Nmap scan results](evidence/nmap-scan-results.png)
+
+![Wazuh agent status](evidence/wazuh-agent-active.png)
+
+![Wazuh Nmap search results](evidence/wazuh-nmap-search-no-results.png)
+
+**Follow-up:** Review available network telemetry and detection-rule coverage, then repeat the authorized scan after any configuration changes. Confirm a correlated Wazuh alert before claiming successful port-scan detection.
+
 ## Incident Documentation
 
 | Reference | Scenario | Documentation |
 |---|---|---|
 | INC-001 | SSH authentication failures | `documentation/incidents/INC-001-ssh-auth-failures.md` |
 | INC-002 | Nginx HTTP 404 alert | `documentation/incidents/INC-002-web-request-alert.md` |
+| INC-003 | Nmap port scan detection gap | `documentation/incidents/INC-003-nmap-port-scan.md` |
 
 ## Standard Operating Procedures
 
 - `documentation/sops/SOP-001-ssh-authentication-failures.md`
 - `documentation/sops/SOP-002-suspicious-web-requests.md`
+- `documentation/sops/SOP-003-port-scan-investigation.md`
 
 The SOPs cover initial triage, evidence collection, investigation, escalation considerations, and closure documentation.
 
